@@ -1,4 +1,4 @@
-import prisma from '@/lib/db'; // Ensure this points to your Prisma client
+import prisma from "@/lib/db"; // Ensure this points to your Prisma client
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -22,7 +22,7 @@ export async function GET(req: Request) {
     console.error("Error fetching patients:", error);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -71,13 +71,13 @@ export async function POST(req: Request) {
 
     return NextResponse.json(
       { patient: newPatient, message: "Patient created successfully" },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error) {
     console.error("Error creating patient:", error);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
@@ -28,19 +28,19 @@ const PatientList = () => {
 
   const handleSearch = async () => {
     try {
-      const response = await fetch('/api/patient', {
-        method: 'GET',
+      const response = await fetch("/api/patient", {
+        method: "GET",
       });
       const data = await response.json();
       setPatients(data.patients);
     } catch (error) {
-      console.error('Error fetching patients:', error);
+      console.error("Error fetching patients:", error);
     }
   };
 
   return (
     <div className="flex flex-col justify-between">
-      <h1 className="font-bold text-4xl pb-8">Search From Patients</h1>
+      <h1 className="pb-8 text-4xl font-bold">Search From Patients</h1>
       <div className="flex flex-row space-x-4 pb-4">
         {/* Search Input */}
         <Input

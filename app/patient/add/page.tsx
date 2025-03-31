@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
@@ -15,23 +15,25 @@ const AddPatientPage = () => {
     address: "",
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     try {
-      const response = await fetch('/api/patient', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/patient", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to add patient');
+        throw new Error("Failed to add patient");
       }
 
       const data = await response.json();
@@ -52,12 +54,12 @@ const AddPatientPage = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-6">Add New Patient</h1>
+    <div className="mx-auto max-w-2xl py-8">
+      <h1 className="mb-6 text-3xl font-bold">Add New Patient</h1>
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* First Name */}
         <div>
-          <label htmlFor="firstName" className="block text-sm font-medium mb-2">
+          <label htmlFor="firstName" className="mb-2 block text-sm font-medium">
             First Name
           </label>
           <Input
@@ -73,7 +75,7 @@ const AddPatientPage = () => {
 
         {/* Last Name */}
         <div>
-          <label htmlFor="lastName" className="block text-sm font-medium mb-2">
+          <label htmlFor="lastName" className="mb-2 block text-sm font-medium">
             Last Name
           </label>
           <Input
@@ -89,7 +91,7 @@ const AddPatientPage = () => {
 
         {/* Email */}
         <div>
-          <label htmlFor="email" className="block text-sm font-medium mb-2">
+          <label htmlFor="email" className="mb-2 block text-sm font-medium">
             Email
           </label>
           <Input
@@ -105,7 +107,7 @@ const AddPatientPage = () => {
 
         {/* Phone */}
         <div>
-          <label htmlFor="phone" className="block text-sm font-medium mb-2">
+          <label htmlFor="phone" className="mb-2 block text-sm font-medium">
             Phone
           </label>
           <Input
@@ -120,7 +122,10 @@ const AddPatientPage = () => {
 
         {/* Date of Birth */}
         <div>
-          <label htmlFor="dateOfBirth" className="block text-sm font-medium mb-2">
+          <label
+            htmlFor="dateOfBirth"
+            className="mb-2 block text-sm font-medium"
+          >
             Date of Birth
           </label>
           <Input
@@ -134,7 +139,7 @@ const AddPatientPage = () => {
 
         {/* Gender */}
         <div>
-          <label htmlFor="gender" className="block text-sm font-medium mb-2">
+          <label htmlFor="gender" className="mb-2 block text-sm font-medium">
             Gender
           </label>
           <select
@@ -142,7 +147,7 @@ const AddPatientPage = () => {
             name="gender"
             value={formData.gender}
             onChange={handleChange}
-            className="border rounded-md p-2 w-full"
+            className="w-full rounded-md border p-2"
             required
           >
             <option value="" disabled>
@@ -156,7 +161,7 @@ const AddPatientPage = () => {
 
         {/* Address */}
         <div>
-          <label htmlFor="address" className="block text-sm font-medium mb-2">
+          <label htmlFor="address" className="mb-2 block text-sm font-medium">
             Address
           </label>
           <Input
@@ -173,7 +178,6 @@ const AddPatientPage = () => {
         <Button type="submit" className="w-full">
           Add Patient
         </Button>
-     
       </form>
     </div>
   );
