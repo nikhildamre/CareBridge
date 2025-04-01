@@ -3,6 +3,7 @@ import "./globals.css";
 import NavBar from "./components/NavBar";
 import SessionProviderWrapper from "@/lib/provider";
 import { getServerSession } from "next-auth";
+import { ThemeProvider } from "@/lib/theme-provider";
 
 export const metadata: Metadata = {
   title: "Automed",
@@ -16,12 +17,14 @@ export default async function RootLayout({
 }>) {
   const session = await getServerSession();
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body>
-        <SessionProviderWrapper session={session}>
-          <NavBar />
-          <main className="p-5">{children}</main>
-        </SessionProviderWrapper>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <SessionProviderWrapper session={session}>
+            <NavBar />
+            <main className="p-5">{children}</main>
+          </SessionProviderWrapper>
+        </ThemeProvider>
       </body>
     </html>
   );

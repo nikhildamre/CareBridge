@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AiFillBug } from "react-icons/ai";
 import { Button } from "@/components/ui/button";
+import { ModeToggle } from "@/components/themetoggle";
 
 function NavBar() {
   const CurrentPath = usePathname();
@@ -46,6 +47,7 @@ function NavBar() {
 
         {/* Right Aligned Button */}
         <div>
+          <ModeToggle />
           <Link href="/login">
             <Button
               size="lg"
