@@ -4,6 +4,7 @@ import NavBar from "./components/NavBar";
 import SessionProviderWrapper from "@/lib/provider";
 import { getServerSession } from "next-auth";
 import { ThemeProvider } from "@/lib/theme-provider";
+import { SessionProvider } from "next-auth/react";
 
 export const metadata: Metadata = {
   title: "Automed",

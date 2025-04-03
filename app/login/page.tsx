@@ -1,8 +1,8 @@
-import { LoginForm } from "@/components/signIn-form";
+import { LoginForm } from "@/components/signup-form";
 
 export default function Page() {
   return (
-    <div className="justify-center">
+    <div>
       <LoginForm />
     </div>
   );
