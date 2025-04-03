@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
-export function LoginForm() {
+export function SignUpForm() {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -144,6 +144,7 @@ export function LoginForm() {
                   <SelectContent>
                     <SelectItem value="USER">User Account</SelectItem>
                     <SelectItem value="ADMIN">Administrator</SelectItem>
+                    <SelectItem value="RES">Resestionist</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

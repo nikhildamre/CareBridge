@@ -70,14 +70,22 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         const extendedUser = user as ExtendedUser;
-        return { ...token, role: extendedUser.role, username: user.username };
+        return {
+          ...token,
+          role: extendedUser.role,
+          username: user.username,
+        };
       }
       return token;
     },
     async session({ session, token }) {
       return {
         ...session,
-        user: { ...session.user, username: token.username },
+        user: {
+          ...session.user,
+          role: token.role,
+          username: token.username,
+        },
       };
     },
   },

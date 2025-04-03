@@ -24,6 +24,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useSession, signIn, signOut } from "next-auth/react";
 
 interface NavItem {
   title: string;
@@ -109,6 +110,7 @@ const navItems: NavItem[] = [
 function NavBar() {
   const pathname = usePathname();
   const [open, setOpen] = React.useState(false);
+  const { data: session } = useSession();
 
   return (
     <nav className="border-b bg-background">
@@ -238,9 +240,23 @@ function NavBar() {
         {/* Right side items */}
         <div className="ml-auto flex items-center gap-4">
           <ModeToggle />
-          <Link href="/login">
-            <Button size="sm">Sign In</Button>
-          </Link>
+          {session ? (
+            <div className="flex items-center gap-4">
+              <div className="text-sm">
+                <p className="font-medium">{session.user?.email}</p>
+                <p className="text-xs text-muted-foreground">
+                  {session.user?.username}
+                </p>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => signOut()}>
+                Sign Out
+              </Button>
+            </div>
+          ) : (
+            <Button size="sm" onClick={() => <Link href={"/signup"}></Link>}>
+              Sign Up
+            </Button>
+          )}
         </div>
       </div>
     </nav>
