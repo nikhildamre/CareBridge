@@ -1,11 +1,25 @@
 import prisma from "@/lib/db"; // Ensure this points to your Prisma client
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { z } from "zod";
 
-export async function GET(req: Request) {
+export async function GET(request: NextRequest) {
   try {
-    // Fetch all patients from the database
-    const patients = await prisma.patient.findMany({
+    // Extract phone number from query parameters
+    const searchParams = request.nextUrl.searchParams;
+    const phone = searchParams.get("phone");
+
+    if (!phone) {
+      return NextResponse.json(
+        { error: "Phone number is required" },
+        { status: 400 },
+      );
+    }
+
+    // Fetch patient by phone number from the database
+    const patient = await prisma.patient.findMany({
+      where: {
+        phone,
+      },
       select: {
         id: true,
         firstName: true,
@@ -16,8 +30,12 @@ export async function GET(req: Request) {
       },
     });
 
-    // Return the patients as JSON
-    return NextResponse.json({ patients });
+    if (!patient) {
+      return NextResponse.json({ error: "Patient not found" }, { status: 404 });
+    }
+
+    // Return the patient as JSON
+    return NextResponse.json({ patient });
   } catch (error) {
     console.error("Error fetching patients:", error);
     return NextResponse.json(

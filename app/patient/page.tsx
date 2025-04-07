@@ -3,105 +3,159 @@
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+// Import Card components (adjust path if necessary)
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import Link from "next/link";
 
-interface Patient {
-  id: string;
-  firstname: string;
-  lastName: string;
-  phone?: string;
-  gender?: string;
-  age?: number;
-}
+import { Patient } from "@prisma/client";
 
 const PatientList = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  // Initialize patients state as an array
   const [patients, setPatients] = useState<Patient[]>([]);
+  const [isLoading, setIsLoading] = useState(false); // Optional: for loading state
+  const [error, setError] = useState<string | null>(null); // Optional: for error handling
 
-  const handleSearch = async () => {
+  const handleSearchByPhoneNumber = async () => {
+    setIsLoading(true);
+    setError(null);
+    setPatients([]); // Clear previous results
+
     try {
-      const response = await fetch("/api/patient", {
+      const response = await fetch(`/api/patient?phone=${searchQuery}`, {
         method: "GET",
       });
+
+      if (!response.ok) {
+        // Handle non-successful responses (e.g., 404 Not Found)
+        const errorData = await response.json();
+        throw new Error(errorData.message || `Error: ${response.status}`);
+      }
+
       const data = await response.json();
-      setPatients(data.patients);
-    } catch (error) {
-      console.error("Error fetching patients:", error);
+
+      // Ensure the API response structure matches expectations
+      // The original code expected data.patient, which might be a single object
+      // If the API can return multiple patients or always an array, adjust accordingly.
+      // This version assumes the API returns { patient: Patient } or { patient: null }
+      // Let's adjust to handle potentially an array OR a single object named 'patient'
+      let foundPatients: Patient[] = [];
+      if (data && data.patient) {
+        if (Array.isArray(data.patient)) {
+          foundPatients = data.patient;
+        } else {
+          // If it's a single object, wrap it in an array
+          foundPatients = [data.patient];
+        }
+      } else if (data && Array.isArray(data)) {
+        // Handle case where API directly returns an array
+        foundPatients = data;
+      }
+
+      setPatients(foundPatients);
+    } catch (err: any) {
+      console.error("Error fetching patient by phone number:", err);
+      setError(err.message || "Failed to fetch patient data.");
+      setPatients([]); // Ensure patients is empty on error
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col justify-between">
-      <h1 className="pb-8 text-4xl font-bold">Search From Patients</h1>
-      <div className="flex flex-row space-x-4 pb-4">
+    <div className="flex flex-col justify-between px-4 py-6 sm:px-10">
+      {" "}
+      {/* Added padding Y and responsive padding X */}
+      <h1 className="pb-8 text-center text-3xl font-bold sm:text-left sm:text-4xl">
+        Search Patients
+      </h1>
+      <div className="flex flex-col space-y-4 pb-8 sm:flex-row sm:space-x-4 sm:space-y-0">
         {/* Search Input */}
         <Input
-          type="text"
-          placeholder="Search For Patient Name"
+          type="text" // Consider type="tel" for phone numbers
+          placeholder="Search For Patient By Phone Number"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
+          className="flex-grow" // Allow input to take available space
         />
         {/* Search Button */}
-        <Button onClick={handleSearch}>Find Patient</Button>
+        <Button
+          onClick={handleSearchByPhoneNumber}
+          disabled={isLoading || !searchQuery.trim()}
+        >
+          {isLoading ? "Searching..." : "Find Patient"}
+        </Button>
       </div>
-
-      {/* Patient Table */}
+      {/* Display Area: Loading, Error, No Results, or Patient Cards */}
       <div className="pb-4">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Contact Number</TableHead>
-              <TableHead>Gender</TableHead>
-              <TableHead>Age</TableHead>
-              <TableHead>Add Appointment</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {patients.length > 0 ? (
-              patients.map((patient) => (
-                <TableRow key={patient.id}>
-                  {/* Name */}
-                  <TableCell className="font-medium">
-                    {patient.firstname} {patient.lastName}
-                  </TableCell>
-                  {/* Contact Number */}
-                  <TableCell>{patient.phone || "N/A"}</TableCell>
-                  {/* Gender */}
-                  <TableCell>{patient.gender || "N/A"}</TableCell>
-                  {/* Age */}
-                  <TableCell>{patient.age || "N/A"}</TableCell>
-                  {/* Add Appointment Button */}
-                  <TableCell>
-                    <Link href={`/appointment/add?patientId=${patient.id}`}>
-                      <Button>Add Appointment</Button>
+        {isLoading && <p className="text-center">Loading patients...</p>}
+        {error && <p className="text-center text-red-600">Error: {error}</p>}
+        {!isLoading &&
+          !error &&
+          (patients.length > 0 ? (
+            // Grid layout for patient cards
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {patients.map((patient) => (
+                <Card key={patient.id} className="flex flex-col">
+                  {" "}
+                  {/* Ensure card layout is flex column */}
+                  <CardHeader>
+                    <CardTitle>
+                      {patient.firstName} {patient.lastName}
+                    </CardTitle>
+                    {/* Optional: You can add a CardDescription here if needed */}
+                  </CardHeader>
+                  <CardContent className="flex-grow space-y-2">
+                    {" "}
+                    {/* flex-grow pushes footer down */}
+                    <p>
+                      <strong>Phone:</strong> {patient.phone || "N/A"}
+                    </p>
+                    <p>
+                      <strong>Gender:</strong> {patient.gender || "N/A"}
+                    </p>
+                    <p>
+                      <strong>Age:</strong> {patient.address || "N/A"}
+                    </p>
+                  </CardContent>
+                  <CardFooter>
+                    <Link
+                      href={`/appointment/add?patientId=${patient.id}`}
+                      className="w-full"
+                    >
+                      {/* Make button full width */}
+                      <Button className="w-full">Add Appointment</Button>
                     </Link>
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center">
-                  No patients found.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            // Show message only if not loading, no error, and search was attempted (or initial state)
+            // We might want to distinguish between initial state and "no results found" after a search.
+            // Let's assume if !isLoading && !error && patients.length === 0, it means no results.
+            // You might need more state (e.g., `searchAttempted`) for a clearer message.
+            <p className="text-center text-gray-500">
+              {searchQuery
+                ? "No patients found matching that phone number."
+                : "Enter a phone number to search."}
+            </p>
+          ))}
       </div>
-
       {/* Add New Patient Button */}
-      <Link href="/patient/add">
-        <Button>Add New Patient</Button>
-      </Link>
+      <div className="mt-4 flex justify-center sm:justify-start">
+        {" "}
+        {/* Center on small screens, left align otherwise */}
+        <Link href="/patient/add">
+          <Button>Add New Patient</Button>
+        </Link>
+      </div>
     </div>
   );
 };

@@ -46,7 +46,7 @@ const navItems: NavItem[] = [
     submenu: [
       {
         title: "All Patients",
-        href: "/patients",
+        href: "/patient",
         icon: <Users className="mr-2 h-4 w-4" />,
       },
       {
@@ -70,11 +70,6 @@ const navItems: NavItem[] = [
         title: "All Doctors",
         href: "/doctors",
         icon: <Users className="mr-2 h-4 w-4" />,
-      },
-      {
-        title: "Add Doctor",
-        href: "/doctors/add",
-        icon: <Stethoscope className="mr-2 h-4 w-4" />,
       },
       {
         title: "Doctor Schedule",
@@ -102,6 +97,23 @@ const navItems: NavItem[] = [
         title: "Appointment History",
         href: "/reception/appointments/history",
         icon: <FileText className="mr-2 h-4 w-4" />,
+      },
+    ],
+  },
+  {
+    title: "Admin Module",
+    href: "/admin",
+    icon: <ClipboardList className="mr-2 h-4 w-4" />,
+    submenu: [
+      {
+        title: "Add Doctor",
+        href: "/doctors/add",
+        icon: <Stethoscope className="mr-2 h-4 w-4" />,
+      },
+      {
+        title: "Add User/ Sign up",
+        href: "/signup",
+        icon: <UserRound className="mr-2 h-4 w-4" />,
       },
     ],
   },
