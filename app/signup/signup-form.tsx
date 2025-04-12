@@ -144,6 +144,7 @@ export function SignUpForm() {
                   <SelectContent>
                     <SelectItem value="USER">User Account</SelectItem>
                     <SelectItem value="ADMIN">Administrator</SelectItem>
+                    <SelectItem value="DOCTOR">Doctor</SelectItem>
                     <SelectItem value="RES">Resestionist</SelectItem>
                   </SelectContent>
                 </Select>

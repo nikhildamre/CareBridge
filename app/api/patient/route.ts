@@ -20,14 +20,6 @@ export async function GET(request: NextRequest) {
       where: {
         phone,
       },
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        phone: true,
-        gender: true,
-        dateOfBirth: true,
-      },
     });
 
     if (!patient) {

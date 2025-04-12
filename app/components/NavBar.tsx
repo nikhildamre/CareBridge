@@ -51,69 +51,48 @@ const navItems: NavItem[] = [
       },
       {
         title: "Add Patient",
-        href: "/patient/add",
+        href: "/patient/addpatient",
         icon: <UserRound className="mr-2 h-4 w-4" />,
-      },
-      {
-        title: "Patient Records",
-        href: "/patients/records",
-        icon: <FileText className="mr-2 h-4 w-4" />,
       },
     ],
   },
   {
     title: "Doctor Module",
-    href: "/doctors",
+    href: "/doctor",
     icon: <Stethoscope className="mr-2 h-4 w-4" />,
     submenu: [
       {
-        title: "All Doctors",
-        href: "/doctors",
+        title: "Doctor Schedule",
+        href: "/doctor/profile",
         icon: <Users className="mr-2 h-4 w-4" />,
       },
-      {
-        title: "Doctor Schedule",
-        href: "/doctors/schedule",
-        icon: <CalendarClock className="mr-2 h-4 w-4" />,
-      },
     ],
   },
-  {
-    title: "Reception Module",
-    href: "/reception",
-    icon: <ClipboardList className="mr-2 h-4 w-4" />,
-    submenu: [
-      {
-        title: "Appointments",
-        href: "/reception/appointments",
-        icon: <CalendarClock className="mr-2 h-4 w-4" />,
-      },
-      {
-        title: "Schedule Appointment",
-        href: "/reception/appointments/schedule",
-        icon: <CalendarClock className="mr-2 h-4 w-4" />,
-      },
-      {
-        title: "Appointment History",
-        href: "/reception/appointments/history",
-        icon: <FileText className="mr-2 h-4 w-4" />,
-      },
-    ],
-  },
+
   {
     title: "Admin Module",
     href: "/admin",
     icon: <ClipboardList className="mr-2 h-4 w-4" />,
     submenu: [
       {
-        title: "Add Doctor",
-        href: "/doctors/add",
-        icon: <Stethoscope className="mr-2 h-4 w-4" />,
-      },
-      {
         title: "Add User/ Sign up",
         href: "/signup",
         icon: <UserRound className="mr-2 h-4 w-4" />,
+      },
+      {
+        title: "Add Doctor",
+        href: "/doctor/add",
+        icon: <Stethoscope className="mr-2 h-4 w-4" />,
+      },
+      {
+        title: "All Doctors",
+        href: "/doctor",
+        icon: <Users className="mr-2 h-4 w-4" />,
+      },
+      {
+        title: "Doctors Profile",
+        href: "/doctor/schedule",
+        icon: <Users className="mr-2 h-4 w-4" />,
       },
     ],
   },
@@ -257,7 +236,7 @@ function NavBar() {
               <div className="text-sm">
                 <p className="font-medium">{session.user?.email}</p>
                 <p className="text-xs text-muted-foreground">
-                  {session.user?.username}
+                  {session.user?.name || session.user?.username}
                 </p>
               </div>
               <Button variant="outline" size="sm" onClick={() => signOut()}>
