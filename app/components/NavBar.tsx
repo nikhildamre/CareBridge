@@ -62,8 +62,13 @@ const navItems: NavItem[] = [
     icon: <Stethoscope className="mr-2 h-4 w-4" />,
     submenu: [
       {
-        title: "Doctor Schedule",
-        href: "/doctor/profile",
+        title: "Doctor Appointments",
+        href: "/doctor/timelines",
+        icon: <Users className="mr-2 h-4 w-4" />,
+      },
+      {
+        title: "Doctor Consultation",
+        href: "/doctor/2/consult",
         icon: <Users className="mr-2 h-4 w-4" />,
       },
     ],
@@ -236,7 +241,7 @@ function NavBar() {
               <div className="text-sm">
                 <p className="font-medium">{session.user?.email}</p>
                 <p className="text-xs text-muted-foreground">
-                  {session.user?.name || session.user?.username}
+                  {session.user?.role}
                 </p>
               </div>
               <Button variant="outline" size="sm" onClick={() => signOut()}>
