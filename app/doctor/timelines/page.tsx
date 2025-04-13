@@ -5,27 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock, User, Building2, Stethoscope } from "lucide-react";
 import Link from "next/link";
-
-// Sample doctor data
-interface DoctorInfo {
-  id: string;
-  name: string;
-  designation: string;
-  department: string;
-  room: string;
-  availableHours: string;
-  currentStatus: "available" | "in-consultation" | "break";
-}
-
-const doctorInfo: DoctorInfo = {
-  id: "D101",
-  name: "Dr. Sarah Wilson",
-  designation: "Senior Consultant",
-  department: "Cardiology",
-  room: "Room 305",
-  availableHours: "9:00 AM - 5:00 PM",
-  currentStatus: "available",
-};
+import { useSession } from "next-auth/react";
+import { Doctor } from "@prisma/client";
 
 // Sample data structure
 interface Appointment {
@@ -75,8 +56,35 @@ export default function DoctorTimeline() {
   const [upcomingAppointments, setUpcomingAppointments] = useState<
     Appointment[]
   >([]);
+  const [doctorInfo, setDoctorInfo] = useState<Doctor | null>(null);
+
+  const { data: session, status } = useSession();
 
   useEffect(() => {
+    const fetchDoctorInfo = async () => {
+      if (status === "authenticated" && session?.user?.email) {
+        try {
+          const response = await fetch("/api/doctors/current", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email: session.user.email }),
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch doctor info");
+          }
+
+          const doctorInfo = await response.json();
+          setDoctorInfo(doctorInfo);
+        } catch (error) {
+          console.error("Error fetching doctor info:", error);
+        }
+      }
+    };
+
+    fetchDoctorInfo();
     // Simulate API call and filter appointments
     const today = new Date().toISOString().split("T")[0];
 
@@ -153,12 +161,14 @@ export default function DoctorTimeline() {
               <Stethoscope className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold">{doctorInfo.name}</h2>
+              <h2 className="text-lg font-semibold">
+                {doctorInfo?.firstName} {doctorInfo?.lastName}
+              </h2>
               <p className="text-sm text-muted-foreground">
-                {doctorInfo.designation}
+                {doctorInfo?.designation}
               </p>
               <p className="text-sm text-muted-foreground">
-                {doctorInfo.department}
+                {doctorInfo?.department}
               </p>
             </div>
           </div>
@@ -170,9 +180,11 @@ export default function DoctorTimeline() {
             </div>
             <div>
               <h3 className="font-semibold">Location</h3>
-              <p className="text-sm text-muted-foreground">{doctorInfo.room}</p>
               <p className="text-sm text-muted-foreground">
-                Working Hours: {doctorInfo.availableHours}
+                {doctorInfo?.phone}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Working Hours: {doctorInfo?.experience}
               </p>
             </div>
           </div>
@@ -186,14 +198,14 @@ export default function DoctorTimeline() {
               <h3 className="font-semibold">Current Status</h3>
               <span
                 className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${
-                  doctorInfo.currentStatus === "available"
+                  doctorInfo?.isAvailable === true
                     ? "bg-green-100 text-green-800"
-                    : doctorInfo.currentStatus === "in-consultation"
+                    : doctorInfo?.isAvailable === false
                       ? "bg-yellow-100 text-yellow-800"
                       : "bg-red-100 text-red-800"
                 }`}
               >
-                {doctorInfo.currentStatus.replace("-", " ")}
+                {doctorInfo?.isAvailable ? "Available" : "Unavailable"}
               </span>
             </div>
           </div>

@@ -96,7 +96,7 @@ const navItems: NavItem[] = [
       },
       {
         title: "Doctors Profile",
-        href: "/doctor/schedule",
+        href: "/doctor/profile",
         icon: <Users className="mr-2 h-4 w-4" />,
       },
     ],

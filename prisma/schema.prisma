@@ -35,9 +35,10 @@ model Patient {
   dateOfBirth  DateTime?
   gender       String?
   address      String?
+  bloodGroup   String?
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
-  appointments Appointment[] // Relation to Appointment model
+  appointments Appointment[] 
 }
 
 model Appointment {
@@ -48,13 +49,15 @@ model Appointment {
   time            DateTime
   status          String       // scheduled, completed, canceled
   type            String       // regular, followup, emergency
-  duration        Int          // in minutes
+  duration        Int    
+  bloodPressure   String?
+  heartRate       String?
+  Tempreture      String?
+  O2Saturation    String?   // in minutes
   symptoms        String?      // Patient's symptoms
   diagnosis       String?      // Doctor's diagnosis
-  prescription    String?      // Prescribed medications
+  prescription    String?      // Prescribed medications(Px)
   notes           String?      // Additional notes
-  followUpDate    DateTime?    // Next appointment date
-  vitals          Json?        // Blood pressure, temperature, etc.
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
   canceledReason  String?
@@ -75,9 +78,6 @@ model Doctor {
   designation     String        // e.g., Senior Consultant
   department      String
   consultationFee Decimal       @db.Decimal(10, 2)
-  availableDays   String[]     // Array of working days
-  startTime       String?       // Daily start time
-  endTime         String?       // Daily end time
   isAvailable     Boolean       @default(true)
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt

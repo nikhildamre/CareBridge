@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-// Import Card components (adjust path if necessary)
 import {
   Card,
   CardContent,
@@ -107,7 +106,9 @@ const PatientList = () => {
                   {/* Ensure card layout is flex column */}
                   <CardHeader>
                     <CardTitle>
-                      {patient.firstName} {patient.lastName}
+                      <h1 className="text-lg font-semibold">
+                        {patient.firstName} {patient.lastName}
+                      </h1>
                     </CardTitle>
                     {/* Optional: You can add a CardDescription here if needed */}
                   </CardHeader>
@@ -126,7 +127,7 @@ const PatientList = () => {
                   </CardContent>
                   <CardFooter>
                     <Link
-                      href={`/appointment/add?patientId=${patient.id}`}
+                      href={`/patient/${patient.id}/addapp`}
                       className="w-full"
                     >
                       {/* Make button full width */}
