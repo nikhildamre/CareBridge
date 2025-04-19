@@ -5,6 +5,7 @@ import SessionProviderWrapper from "@/lib/provider";
 import { getServerSession } from "next-auth";
 import { ThemeProvider } from "@/lib/theme-provider";
 import { SessionProvider } from "next-auth/react";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: "Automed",
@@ -25,6 +26,7 @@ export default async function RootLayout({
             <NavBar />
             <main className="p-5">{children}</main>
           </SessionProviderWrapper>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
