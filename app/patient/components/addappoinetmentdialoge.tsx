@@ -39,7 +39,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 
 type AppointmentDialogProps = {
   patient: Patient;

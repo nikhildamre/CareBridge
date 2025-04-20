@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -10,45 +11,45 @@ import {
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AIPatientSummary } from "./AIPatientSummary";
-// Static patient data
-const patientData = {
-  id: "P123",
-  name: "John Doe",
-  age: 45,
-  gender: "Male",
-  lastVisit: "2024-04-13",
-  recentVitals: {
-    bloodPressure: "138/88",
-    heartRate: "76",
-    temperature: "98.6°F",
-    oxygenSaturation: "98%",
-  },
-  appointments: [
-    {
-      date: "2024-04-13",
-      reason: "Follow-up",
-      diagnosis: "Hypertension - Controlled",
-      prescription: "Lisinopril 10mg",
-      notes: "Blood pressure showing improvement. Continue current medication.",
-    },
-    {
-      date: "2024-03-15",
-      reason: "Regular Checkup",
-      diagnosis: "Diabetes Type 2 - Stable",
-      prescription: "Metformin 500mg",
-      notes: "Blood sugar levels stable. Maintaining diet control.",
-    },
-    {
-      date: "2024-02-01",
-      reason: "Emergency Visit",
-      diagnosis: "Acute Dizziness",
-      prescription: "Rest and hydration",
-      notes: "Related to blood pressure spike. Adjusted medication dosage.",
-    },
-  ],
-};
 
-export default function ConsultPage() {
+export default function ConsultPage({ params }: { params: { id: string } }) {
+  const [patientData, setPatientData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPatientData = async () => {
+      try {
+        const response = await fetch(`/api/patient/${params.id}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch patient data");
+        }
+
+        const data = await response.json();
+        setPatientData(data);
+      } catch (error) {
+        console.error("Error fetching patient data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPatientData();
+  }, [params.id]);
+
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
+
+  if (!patientData) {
+    return <p>No patient data found.</p>;
+  }
+
   return (
     <div className="container mx-auto max-w-7xl p-6">
       <div className="grid gap-6">
@@ -137,25 +138,27 @@ export default function ConsultPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
-                  {patientData.appointments.map((appointment, index) => (
-                    <div key={index} className="border-b pb-4 last:border-0">
-                      <div className="mb-2 flex items-start justify-between">
-                        <h4 className="font-medium">{appointment.date}</h4>
-                        <span className="text-sm text-muted-foreground">
-                          {appointment.reason}
-                        </span>
+                  {patientData.appointments.map(
+                    (appointment: any, index: number) => (
+                      <div key={index} className="border-b pb-4 last:border-0">
+                        <div className="mb-2 flex items-start justify-between">
+                          <h4 className="font-medium">{appointment.date}</h4>
+                          <span className="text-sm text-muted-foreground">
+                            {appointment.reason}
+                          </span>
+                        </div>
+                        <p className="mb-1 text-sm">
+                          Diagnosis: {appointment.diagnosis}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          Rx: {appointment.prescription}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          Notes: {appointment.notes}
+                        </p>
                       </div>
-                      <p className="mb-1 text-sm">
-                        Diagnosis: {appointment.diagnosis}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        Rx: {appointment.prescription}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        Notes: {appointment.notes}
-                      </p>
-                    </div>
-                  ))}
+                    ),
+                  )}
                 </div>
               </CardContent>
             </Card>
