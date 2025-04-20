@@ -63,7 +63,7 @@ export default function DoctorList() {
     <div className="container mx-auto px-4 py-10">
       <div className="mb-8 flex items-center justify-between">
         <h1 className="text-4xl font-bold text-primary">Doctors Directory</h1>
-        <Link href="/doctors/new">
+        <Link href="/doctor/add">
           <Button className="bg-green-600 text-white hover:bg-green-700">
             Add New Doctor
           </Button>

@@ -12,8 +12,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AppointmentDialog } from "./components/addappoinetmentdialoge";
 import { Patient } from "@prisma/client";
+import { useRouter } from "next/navigation";
 
 const PatientList = () => {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -56,6 +58,16 @@ const PatientList = () => {
       setPatients([]);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleDialogClose = (open: boolean) => {
+    setIsDialogOpen(open);
+    if (!open) {
+      // Clear the search state and refresh the page
+      setSearchQuery("");
+      setPatients([]);
+      router.refresh();
     }
   };
 
@@ -131,7 +143,7 @@ const PatientList = () => {
         <AppointmentDialog
           patient={selectedPatient}
           open={isDialogOpen}
-          onOpenChange={setIsDialogOpen}
+          onOpenChange={handleDialogClose}
         />
       )}
     </div>

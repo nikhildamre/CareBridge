@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { CalendarIcon, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -24,22 +23,23 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { useForm } from "react-hook-form";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Patient } from "@prisma/client";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 type AppointmentDialogProps = {
   patient: Patient;
@@ -59,10 +59,6 @@ type FormValues = {
   heartRate: string;
   temperature: string;
   o2Saturation: string;
-  symptoms: string;
-  diagnosis: string;
-  prescription: string;
-  notes: string;
 };
 
 export function AppointmentDialog({
@@ -71,28 +67,55 @@ export function AppointmentDialog({
   onOpenChange,
 }: AppointmentDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [doctors, setDoctors] = useState<{ id: number; name: string }[]>([]);
 
   const form = useForm<FormValues>({
     defaultValues: {
       patientId: patient.id,
-      doctorId: 1, // Default doctor ID
+      doctorId: 0, // Default doctor ID (set dynamically)
       date: new Date(),
       time: "09:00",
       status: "scheduled",
       type: "regular",
-      duration: 30,
+      duration: 20,
       bloodPressure: "",
       heartRate: "",
       temperature: "",
       o2Saturation: "",
-      symptoms: "",
-      diagnosis: "",
-      prescription: "",
-      notes: "",
     },
   });
 
   const { toast } = useToast();
+  const router = useRouter();
+
+  // Fetch doctors dynamically
+  useEffect(() => {
+    async function fetchDoctors() {
+      try {
+        const response = await fetch("/api/doctors");
+        if (!response.ok) {
+          throw new Error("Failed to fetch doctors");
+        }
+        const data = await response.json();
+        setDoctors(
+          data.map((doctor: any) => ({
+            id: doctor.id,
+            name: `Dr. ${doctor.firstName} ${doctor.lastName}`,
+          })),
+        );
+      } catch (error) {
+        console.error("Error fetching doctors:", error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch doctors",
+          variant: "destructive",
+          duration: 3000,
+        });
+      }
+    }
+
+    fetchDoctors();
+  }, [toast]);
 
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
@@ -110,8 +133,8 @@ export function AppointmentDialog({
 
       const appointment = await response.json();
       console.log("Appointment created:", appointment);
+      router.refresh();
 
-      // Show success message (you can use toast notification)
       toast({
         title: "Success",
         description: "Appointment scheduled successfully",
@@ -122,7 +145,6 @@ export function AppointmentDialog({
       form.reset();
     } catch (error) {
       console.error("Error creating appointment:", error);
-      // Show error message
       toast({
         title: "Error",
         description: "Failed to schedule appointment",
@@ -131,6 +153,8 @@ export function AppointmentDialog({
       });
     } finally {
       setIsSubmitting(false);
+      router.push(`/patient`);
+      router.refresh();
     }
   };
 
@@ -139,8 +163,7 @@ export function AppointmentDialog({
       <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            Book Appointment for {patient.firstName}
-            {patient.lastName}
+            Book Appointment for {patient.firstName} {patient.lastName}
           </DialogTitle>
           <DialogDescription>
             Fill in the details below to schedule a new appointment.
@@ -150,6 +173,40 @@ export function AppointmentDialog({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              {/* Doctor Selection */}
+              <FormField
+                control={form.control}
+                name="doctorId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Doctor</FormLabel>
+                    <Select
+                      onValueChange={(value) =>
+                        field.onChange(Number.parseInt(value))
+                      }
+                      defaultValue={field.value.toString()}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a doctor" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {doctors.map((doctor) => (
+                          <SelectItem
+                            key={doctor.id}
+                            value={doctor.id.toString()}
+                          >
+                            {doctor.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               {/* Date and Time */}
               <FormField
                 control={form.control}
@@ -208,35 +265,7 @@ export function AppointmentDialog({
                 )}
               />
 
-              {/* Doctor, Type, Status */}
-              <FormField
-                control={form.control}
-                name="doctorId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Doctor</FormLabel>
-                    <Select
-                      onValueChange={(value) =>
-                        field.onChange(Number.parseInt(value))
-                      }
-                      defaultValue={field.value.toString()}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a doctor" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="1">Dr. John Smith</SelectItem>
-                        <SelectItem value="2">Dr. Sarah Johnson</SelectItem>
-                        <SelectItem value="3">Dr. Michael Brown</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
+              {/* Other fields */}
               <FormField
                 control={form.control}
                 name="type"
@@ -306,9 +335,6 @@ export function AppointmentDialog({
                         }
                       />
                     </FormControl>
-                    <FormDescription>
-                      Appointment duration in minutes
-                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -368,84 +394,6 @@ export function AppointmentDialog({
                         <FormLabel>O2 Saturation</FormLabel>
                         <FormControl>
                           <Input placeholder="e.g. 98%" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-
-              {/* Medical Notes */}
-              <div className="md:col-span-2">
-                <h3 className="mb-2 text-lg font-medium">Medical Notes</h3>
-                <div className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="symptoms"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Symptoms</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Patient's symptoms"
-                            className="min-h-[80px]"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="diagnosis"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Diagnosis</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Doctor's diagnosis"
-                            className="min-h-[80px]"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="prescription"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Prescription</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Prescribed medications"
-                            className="min-h-[80px]"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="notes"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Additional Notes</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Any additional notes"
-                            className="min-h-[80px]"
-                            {...field}
-                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

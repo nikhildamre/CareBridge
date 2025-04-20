@@ -2,7 +2,6 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
-import { Doctor } from "@prisma/client";
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,6 +22,44 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(doctor);
   } catch (error) {
     console.error("Error fetching doctor info:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
+  }
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const doctorId = searchParams.get("doctorId");
+
+    if (!doctorId) {
+      return NextResponse.json(
+        { error: "Doctor ID is required" },
+        { status: 400 },
+      );
+    }
+
+    const appointments = await prisma.appointment.findMany({
+      where: {
+        doctorId: parseInt(doctorId),
+      },
+      include: {
+        patient: {
+          select: {
+            firstName: true,
+            lastName: true,
+            email: true,
+            phone: true,
+          },
+        },
+      },
+    });
+
+    return NextResponse.json(appointments);
+  } catch (error) {
+    console.error("Error fetching appointments:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },
