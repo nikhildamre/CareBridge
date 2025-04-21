@@ -1,4 +1,4 @@
-// File: app/api/patient/[id]/route.ts
+// File: app/api/appointment/[id]/route.ts
 
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
@@ -8,14 +8,29 @@ export async function GET(
   { params }: { params: { id: string } },
 ) {
   try {
-    // Validate and parse the patient ID
-    const patientId = parseInt(params.id, 10);
-    if (isNaN(patientId)) {
+    // Validate and parse the appointment ID
+    const appointmentId = parseInt(params.id, 10);
+    if (isNaN(appointmentId)) {
       return NextResponse.json(
-        { error: "Invalid patient ID format" },
+        { error: "Invalid appointment ID format" },
         { status: 400 },
       );
     }
+
+    // Fetch the appointment to get the patient ID
+    const appointment = await prisma.appointment.findUnique({
+      where: { id: appointmentId },
+      select: { patientId: true },
+    });
+
+    if (!appointment || !appointment.patientId) {
+      return NextResponse.json(
+        { error: "Appointment or related patient not found" },
+        { status: 404 },
+      );
+    }
+
+    const patientId = appointment.patientId;
 
     // Fetch patient details
     const patient = await prisma.patient.findUnique({
@@ -34,7 +49,7 @@ export async function GET(
     // Fetch the most recent appointment for vitals
     const recentAppointment = await prisma.appointment.findFirst({
       where: { patientId },
-      orderBy: { date: "desc" }, // Get the latest appointment
+      orderBy: { date: "asc" }, // Get the latest appointment
     });
 
     const recentVitals = recentAppointment

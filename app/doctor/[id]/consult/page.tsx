@@ -11,15 +11,25 @@ import {
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AIPatientSummary } from "./AIPatientSummary";
+import { ConsultingDialog } from "./doctors-consultation";
+import { useParams } from "next/navigation";
 
 export default function ConsultPage({ params }: { params: { id: string } }) {
   const [patientData, setPatientData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const routeParams = useParams(); // ✅ grab the params from the URL
+  const AppointmentId = routeParams?.id as string;
+
+  const handleDialogClose = (open: boolean) => {
+    setIsDialogOpen(open);
+  };
 
   useEffect(() => {
     const fetchPatientData = async () => {
       try {
-        const response = await fetch(`/api/patient/${params.id}`, {
+        const response = await fetch(`/api/patient/${AppointmentId}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -40,7 +50,7 @@ export default function ConsultPage({ params }: { params: { id: string } }) {
     };
 
     fetchPatientData();
-  }, [params.id]);
+  }, [routeParams.id]);
 
   if (isLoading) {
     return <p>Loading...</p>;
@@ -63,7 +73,13 @@ export default function ConsultPage({ params }: { params: { id: string } }) {
                 {patientData.gender}
               </CardDescription>
             </div>
-            <Button>Start Consultation</Button>
+            <Button
+              onClick={() => {
+                setIsDialogOpen(true);
+              }}
+            >
+              Start Consultation
+            </Button>
           </CardHeader>
         </Card>
 
@@ -165,6 +181,13 @@ export default function ConsultPage({ params }: { params: { id: string } }) {
           </TabsContent>
         </Tabs>
       </div>
+      {isDialogOpen && (
+        <ConsultingDialog
+          appointmentId={patientData.appointments[0]?.id}
+          open={isDialogOpen}
+          onOpenChange={handleDialogClose}
+        />
+      )}
     </div>
   );
 }

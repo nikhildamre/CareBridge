@@ -95,28 +95,41 @@ const PatientList = () => {
         {!isLoading &&
           !error &&
           (patients.length > 0 ? (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="flex flex-col space-y-6">
               {patients.map((patient) => (
-                <Card key={patient.id} className="flex flex-col">
-                  <CardHeader>
-                    <CardTitle>
-                      <h1 className="text-lg font-semibold">
-                        {patient.firstName} {patient.lastName}
-                      </h1>
+                <Card
+                  key={patient.id}
+                  className="w-full rounded-2xl border border-gray-200 shadow-md transition-shadow duration-300 hover:shadow-lg"
+                >
+                  <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <CardTitle className="text-xl font-bold">
+                      {patient.firstName} {patient.lastName} {"  -  "}
+                      <span className="bg-grey-100 rounded-md px-2 py-1">
+                        {patient.gender || "N/A"}
+                      </span>
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="flex-grow space-y-2">
+
+                  <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <p>
                       <strong>Phone:</strong> {patient.phone || "N/A"}
                     </p>
                     <p>
-                      <strong>Gender:</strong> {patient.gender || "N/A"}
+                      <strong>Email:</strong> {patient.email || "N/A"}
                     </p>
                     <p>
-                      <strong>Age:</strong> {patient.age || "N/A"}
+                      <strong>Age:</strong> {patient.age ?? "N/A"}
+                    </p>
+                    <p>
+                      <strong>Blood Group:</strong>{" "}
+                      {patient.bloodGroup || "N/A"}
+                    </p>
+                    <p className="sm:col-span-2">
+                      <strong>Address:</strong> {patient.address || "N/A"}
                     </p>
                   </CardContent>
-                  <CardFooter>
+
+                  <CardFooter className="mt-2">
                     <Button
                       className="w-full"
                       onClick={() => {

@@ -139,7 +139,7 @@ export default function DoctorTimeline() {
             >
               {appointment.type}
             </span>
-            <Link href={`/doctor/${appointment.patientId}/consult`}>
+            <Link href={`/doctor/${appointment.id}/consult`}>
               <Button size="sm">Consult</Button>
             </Link>
           </div>

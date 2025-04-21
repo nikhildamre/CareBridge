@@ -3,6 +3,7 @@ import prisma from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
+// CREATE new appointment
 export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -12,7 +13,6 @@ export async function POST(request: Request) {
 
     const data = await request.json();
 
-    // Combine date and time into a single DateTime
     const appointmentDate = new Date(data.date);
     const [hours, minutes] = data.time.split(":");
     appointmentDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);

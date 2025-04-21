@@ -44,7 +44,11 @@ export async function GET(request: NextRequest) {
     const appointments = await prisma.appointment.findMany({
       where: {
         doctorId: parseInt(doctorId),
+        status: {
+          not: "Completed",
+        },
       },
+
       include: {
         patient: {
           select: {
