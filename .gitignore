@@ -1,4 +1,7 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# ------------------------------------------------------------------------------
+# .gitignore file customized by Nikhil Damre
+# For use in Node.js + Next.js + TypeScript + Vercel projects
+# ------------------------------------------------------------------------------
 
 # dependencies
 /node_modules
@@ -39,3 +42,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# IDE/editor specific (optional)
+/.vscode/
+/.idea/
+
+# monorepo tools (optional)
+/dist/
+/.turbo
+
+# eslint / prettier cache
+.eslintcache
